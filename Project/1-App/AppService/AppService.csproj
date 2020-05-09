@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nancy" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\1-Domain\Sale.Domain.Query\Sale.Domain.Query.csproj" />
+    <ProjectReference Include="..\..\1-Domain\Sale.Domain\Sale.Domain.csproj" />
+    <ProjectReference Include="..\AppService.Contracts\AppService.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
