@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AppService;
 using Framework.Application;
 using Nancy;
@@ -29,13 +30,48 @@ namespace App.Distributor
             foreach (var command in commands)
             {
                 var address = $"/{command.Name}";
-                var makeHandler = this.GetType().GetMethod("MakeHandler", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                var makeHandler = this.GetType().GetMethod("MakeHandler1", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
                     .MakeGenericMethod(command);
-                Get(address, x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
-                Post(address, x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
+                //    //     Get["/"] = parameters => "Hello World!";
 
+                //    Get(address+"t", async (args, ct) =>
+                //    {
+                //        var result = await MakeHandler1(this);
+                //        return result;
+                //    });
+
+                //    Post(address + "t", async (args, ct) =>
+                //    {
+
+                //    var result = await MakeHandler(this);
+                //    return result;
+                //});
+
+                
+
+                Get(address, async x => await (Task<object>)makeHandler.Invoke(this, new object[0]));
+                Post(address, async x => await (Task<object>)makeHandler.Invoke(this, new object[0]));
+
+
+                //Get(address,  x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
+                //Post(address,  x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
             }
+    }
+
+
+        public async Task<object> MakeHandler1<T>()
+        {
+           
+                var bus = Program.container.GetInstance<ICommandBus>();
+                var command = this.Bind<T>();
+                //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
+                using (AsyncScopedLifestyle.BeginScope(Program.container))
+                    bus.Dispatch(command);
+                if (command is IHaveResult) return ((IHaveResult)command).Result;
+                return "ok";
+          
         }
+
 
         public Func<object, object> MakeHandler<T>()
         {
