@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Framework.Application
 {
     public class ValidatorCommandHandler<T> : ICommandHandler<T>
@@ -10,10 +12,10 @@ namespace Framework.Application
             _decoratee = decoratee;
             this.validator = validator;
         }
-        public void Handle(T command)
+        public async Task HandleAsync(T command)
         {
             validator.Validate(command);
-            _decoratee.Handle(command);
+            await _decoratee.HandleAsync(command);
         }
     }
 }

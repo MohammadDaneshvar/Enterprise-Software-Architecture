@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Framework.Application
 {
     public class CommandBus : ICommandBus
@@ -8,9 +10,9 @@ namespace Framework.Application
         {
             _factory = factory;
         }
-        public void Dispatch<T>(T command)
+        public async Task DispatchAsync<T>(T command)
         {
-            _factory.CreateHandler<T>().Handle(command);
+            await _factory.CreateHandler<T>().HandleAsync(command);
         }
     }
 }

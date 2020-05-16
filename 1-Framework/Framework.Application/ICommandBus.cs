@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace Framework.Application
 {
     public interface ICommandBus
     {
-        void Dispatch<T>(T command);
+         Task DispatchAsync<T>(T command);
     }
 }

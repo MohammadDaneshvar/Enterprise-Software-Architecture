@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Framework.Application
 {
     public class CacheDecoratorCommandHandler<T> : ICommandHandler<T>
@@ -12,22 +14,22 @@ namespace Framework.Application
             _keyGenerator = keyGenerator;
             _decoratee = decoratee;
         }
-
-        public void Handle(T command)
+        public async Task HandleAsync(T command)
         {
             var key = _keyGenerator.GenerateKeyForCache(command);
             if (string.IsNullOrEmpty(key))
             {
-                _decoratee.Handle(command);
+                await _decoratee.HandleAsync(command);
                 return;
             }
-            var result = cacheProvider.Get(key);
+            var result = await cacheProvider.GetAsync(key);
             if (result != null)
                 ((IHaveResult)command).Result = result;
             else
             {
-                _decoratee.Handle(command);
-                cacheProvider.Add(key, ((IHaveResult)command).Result);
+                await _decoratee.HandleAsync(command);
+                await cacheProvider.AddAsync(key, ((IHaveResult)command).Result);
+
             }
         }
     }

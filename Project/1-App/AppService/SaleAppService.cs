@@ -4,6 +4,7 @@ using Framework.Domain.Repository;
 using AppService.Contracts;
 using Sale.Domain.Query.Model;
 using Sale.Domain.OrderAgg;
+using System.Threading.Tasks;
 
 namespace AppService
 {
@@ -25,7 +26,7 @@ namespace AppService
         //    _orderRepository.Add(order);
         //    _unitOfWork.Commit();
         //}
-        public void Handle(CreateOrderCommand command)
+        public async Task HandleAsync(CreateOrderCommand command)
         {
             //_unitOfWork.Begin();
             //var order = new Order(command.CustomerId);
@@ -34,7 +35,7 @@ namespace AppService
             //_unitOfWork.Commit();
         }
 
-        public void Handle(EditOrderCommand command)
+        public async Task HandleAsync(EditOrderCommand command)
         {
 
         }

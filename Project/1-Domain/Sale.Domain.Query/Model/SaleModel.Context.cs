@@ -10,28 +10,29 @@
 
 using Framework.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Sale.Domain.Query.Model
 {
 
     public partial class SaleEntities : IDbContext
     {
-        public void Begin()
+        public Task BeginAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public void Commit()
+        public Task CommitAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public int SaveChanges()
+        public Task<int> SaveChangesAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public void Rollback()
+        public Task RollbackAsync()
         {
             throw new System.NotImplementedException();
         }

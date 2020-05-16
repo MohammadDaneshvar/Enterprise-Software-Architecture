@@ -10,24 +10,26 @@ namespace Framework.Data.EF
         {
             _dbContext = dbContext;
         }
-        public void Begin()
+        public async Task BeginAsync()
         {
-            _dbContext.Begin();
+            await _dbContext.BeginAsync();
         }
 
-        public void Commit()
+        public async Task CommitAsync()
         {
-            _dbContext.Commit();
+            await _dbContext.CommitAsync();
         }
-        public int SaveChanges()
+        public async Task<int> SaveChangesAsync()
         {
-            return _dbContext.SaveChanges();
+            return await _dbContext.SaveChangesAsync();
         }
 
-        public void Rollback()
+        public async Task RollbackAsync()
         {
-            _dbContext.Rollback();
+          await   _dbContext.RollbackAsync();
         }
+
+  
         //public Task<IDbContextTransaction> BeginAsync()
         //{
         //  return   await _dbContext.Database.BeginTransactionAsync();

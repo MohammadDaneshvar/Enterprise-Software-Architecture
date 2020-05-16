@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Framework.Application
 {
@@ -9,12 +10,12 @@ namespace Framework.Application
             Storage = new Dictionary<string, object>();
         }
         private Dictionary<string, object> Storage { get; set; }
-        public void Add(string key, object value)
+        public async Task  AddAsync(string key, object value)
         {
             Storage[key] = value;
         }
 
-        public object Get(string key)
+        public async Task<object> GetAsync(string key)
         {
             return Storage.ContainsKey(key)? Storage[key]:null;
         }

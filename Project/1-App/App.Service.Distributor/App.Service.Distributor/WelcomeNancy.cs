@@ -21,16 +21,16 @@ namespace App.Distributor
                     .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type")
             );
 
-            var s = Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
+            var commandHandlers= Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
                 new[] { typeof(SaleAppService).Assembly });
             var commands =
-                s.SelectMany(type => type.GetInterfaces())
+                commandHandlers.SelectMany(type => type.GetInterfaces())
                     .Where(type => type.IsGenericType)
                     .Select(type => type.GetGenericArguments().First());
             foreach (var command in commands)
             {
                 var address = $"/{command.Name}";
-                var makeHandler = this.GetType().GetMethod("MakeHandler1", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                var makeHandler = this.GetType().GetMethod("MakeHandler", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
                     .MakeGenericMethod(command);
                 //    //     Get["/"] = parameters => "Hello World!";
 
@@ -59,33 +59,33 @@ namespace App.Distributor
     }
 
 
-        public async Task<object> MakeHandler1<T>()
+        public async Task<object> MakeHandler<T>()
         {
            
                 var bus = Program.container.GetInstance<ICommandBus>();
                 var command = this.Bind<T>();
                 //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
                 using (AsyncScopedLifestyle.BeginScope(Program.container))
-                    bus.Dispatch(command);
+                    await bus.DispatchAsync(command);
                 if (command is IHaveResult) return ((IHaveResult)command).Result;
                 return "ok";
           
         }
 
 
-        public Func<object, object> MakeHandler<T>()
-        {
-            return _ =>
-            {
-                var bus = Program.container.GetInstance<ICommandBus>();
-                var command = this.Bind<T>();
-                //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
-                using (AsyncScopedLifestyle.BeginScope(Program.container))
-                    bus.Dispatch(command);
-                if (command is IHaveResult) return ((IHaveResult)command).Result;
-                return "ok";
-            };
-        }
+        //public Func<object, object> MakeHandler<T>()
+        //{
+        //    return _ =>
+        //    {
+        //        var bus = Program.container.GetInstance<ICommandBus>();
+        //        var command = this.Bind<T>();
+        //        //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
+        //        using (AsyncScopedLifestyle.BeginScope(Program.container))
+        //           await  bus.DispatchAsync(command);
+        //        if (command is IHaveResult) return ((IHaveResult)command).Result;
+        //        return "ok";
+        //    };
+        //}
     }
 
 }

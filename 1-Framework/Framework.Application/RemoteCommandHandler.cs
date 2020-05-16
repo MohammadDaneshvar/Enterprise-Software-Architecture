@@ -1,6 +1,7 @@
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Framework.Application
@@ -10,14 +11,14 @@ namespace Framework.Application
         public RemoteCommandHandler()
         {
         }
-        public void Handle(T command)
+        public async Task HandleAsync(T command)
         {
             var address = new Uri($"http://{"localhost"}:{"228"}/{command.GetType().Name}");
             var basicHttpBinding = new BasicHttpBinding { MaxReceivedMessageSize = 2147483647 };
 
             var factory = new ChannelFactory<ICommandHandlerService<T>>(basicHttpBinding, new EndpointAddress(address));
             var client = factory.CreateChannel();
-            var result = client.Send(command);
+            var result = await client.SendAsync(command);
             if (result != null)
             {
                 ((IHaveResult)command).Result = JsonConvert.DeserializeObject(result, new JsonSerializerSettings()

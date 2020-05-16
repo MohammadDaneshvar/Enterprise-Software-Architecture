@@ -1,4 +1,5 @@
 using Framework.Data.EF;
+using System.Threading.Tasks;
 
 namespace Framework.Application
 {
@@ -12,11 +13,11 @@ namespace Framework.Application
             _decoratee = decoratee;
             _unitOfWork = unitOfWork;
         }
-        public void Handle(T command)
+        public async Task HandleAsync(T command)
         {
-            _unitOfWork.Begin();
-            _decoratee.Handle(command);
-            _unitOfWork.Commit();
+            _unitOfWork.BeginAsync();
+            await _decoratee.HandleAsync(command);
+            _unitOfWork.CommitAsync();
         }
     }
 }

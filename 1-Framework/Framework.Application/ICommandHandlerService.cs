@@ -1,4 +1,5 @@
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Framework.Application
 {
@@ -6,6 +7,6 @@ namespace Framework.Application
     public interface ICommandHandlerService<TCommand>
     {
         [OperationContract]
-        string Send(TCommand command);
+        Task<string> SendAsync(TCommand command);
     }
 }

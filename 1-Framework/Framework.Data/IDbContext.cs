@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Framework.Data
 {
     public interface IDbContext
     {
-        void Begin();
-        void Commit();
-        int SaveChanges();
-        void Rollback();
+        Task BeginAsync();
+        Task CommitAsync();
+        Task<int> SaveChangesAsync();
+        Task RollbackAsync();
     }
 }

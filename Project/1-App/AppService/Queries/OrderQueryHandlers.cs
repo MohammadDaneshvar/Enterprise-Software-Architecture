@@ -2,6 +2,7 @@
 using AppService.Contracts.Queries;
 using AppService.Queries.Convertors;
 using Sale.Domain.Query.Finders;
+using System.Threading.Tasks;
 
 namespace AppService.Queries
 {
@@ -16,6 +17,6 @@ namespace AppService.Queries
 
         public ISaleFinder SaleFinder => _saleFinder;
 
-        public void Handle(GetOrderByIdQuery command) => command.Result = SaleFinder.FindById(command.Id);
+        public async Task HandleAsync(GetOrderByIdQuery command) => command.Result = SaleFinder.FindById(command.Id);
     }
 }
