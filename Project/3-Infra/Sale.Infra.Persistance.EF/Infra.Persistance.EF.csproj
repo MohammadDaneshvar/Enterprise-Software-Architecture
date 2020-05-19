@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200518091706_InitialCreate.cs" />
+    <Compile Remove="Migrations\20200518091706_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20200518091732_InitialCreate.cs" />
+    <Compile Remove="Migrations\20200518091732_InitialCreate.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\1-Framework\Framework.Data\Framework.Data.csproj" />
+    <ProjectReference Include="..\..\1-Domain\Domain\Domain.csproj" />
+  </ItemGroup>
+
+</Project>

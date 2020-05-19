@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Framework.Domain;
 using Framework.Domain.Aggregate;
 using Framework.Domain.Events;
@@ -13,23 +14,32 @@ using Newtonsoft.Json;
 
 namespace Framework.Data.EF
 {
-    public class EFRepository<T> : IRepository<T> where T : class, IAggregateRoot
+
+    public interface IX<T> where T : class
     {
-        private readonly DbContext _dbContext;
+      
+    }
+    public class X<T>:IX<T> where T : class
+    {
+
+    }
+
+    public class EFRepository<T> : IRepository<T> where T : class /*,IAggregateRoot*/
+    {
+        private readonly IDbContext _dbContext;
         private IEventDispatcher eventDispatcher;
         private MethodInfo dispatchMethod;
-        public EFRepository(DbContext dbContext, IEventDispatcher eventDispatcher)
+        public EFRepository(IDbContext dbContext, IEventDispatcher eventDispatcher)
         {
             this._dbContext = dbContext;
             this.eventDispatcher = eventDispatcher;
             dispatchMethod = eventDispatcher.GetType().GetMethod("Dispatch");
         }
 
-        public bool Add(T entity)
+        public async Task AddAsync(T entity)
         {
-            this._dbContext.Add(entity);
-            DispatchEvents(entity);
-            return true;
+            await this._dbContext.AddAsync(entity);
+       //     DispatchEvents(entity);
         }
         readonly JsonSerializerSettings setting = new JsonSerializerSettings
         {
@@ -37,54 +47,51 @@ namespace Framework.Data.EF
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
-        private void DispatchEvents(T entity)
-        {
-            var events = entity.GetUnPublishedEvents().ToList();
-            entity.ClearEvents();
-            events.ForEach(@event =>
-            {
-                @event.AggregateRootId = entity.Id.ToString();
-                @event.CreateDate = DateTime.Now;
-                @event.UserName = Thread.CurrentPrincipal.Identity.Name;
-                dispatchMethod.MakeGenericMethod(@event.GetType()).Invoke(eventDispatcher, new object[] { @event });
-            });
-            foreach (var e in events)
-            {
-                //session.Save(new Event(e.GetType().FullName, e.UserName, e.AggregateRootId,
-                //    JsonConvert.SerializeObject(e, setting), e.GetType().FullName));
-            }
-        }
+        //private void DispatchEvents(T entity)
+        //{
+        //    var events = entity.GetUnPublishedEvents().ToList();
+        //    entity.ClearEvents();
+        //    events.ForEach(@event =>
+        //    {
+        //        @event.AggregateRootId = entity.Id.ToString();
+        //        @event.CreateDate = DateTime.Now;
+        //        @event.UserName = Thread.CurrentPrincipal.Identity.Name;
+        //        dispatchMethod.MakeGenericMethod(@event.GetType()).Invoke(eventDispatcher, new object[] { @event });
+        //    });
+        //    foreach (var e in events)
+        //    {
+        //        //session.Save(new Event(e.GetType().FullName, e.UserName, e.AggregateRootId,
+        //        //    JsonConvert.SerializeObject(e, setting), e.GetType().FullName));
+        //    }
+        //}
 
-        public bool Add(IEnumerable<T> items)
+        public async Task AddRangeAsync(IEnumerable<T> items)
         {
-            _dbContext.AddRange(items);
-            return true;
+            await _dbContext.AddRangeAsync(items);
         }
 
         public bool Update(T entity)
         {
             _dbContext.Update(entity);
-            DispatchEvents(entity);
+          //  DispatchEvents(entity);
 
             return true;
         }
 
-        public bool Delete(T entity)
+        public void Remove(T entity)
         {
             _dbContext.Remove(entity);
-            DispatchEvents(entity);
-            return true;
+        //    DispatchEvents(entity);
         }
 
-        public bool Delete(IEnumerable<T> entities)
+        public  void RemoveRange(IEnumerable<T> entities)
         {
             _dbContext.RemoveRange(entities);
-            return true;
         }
 
-        public T FindBy(object id)
+        public async Task<TEntity> FindAsync<TEntity, TKey>(TKey id) where TEntity : class
         {
-            return _dbContext.Find<T>(id);
+            return await _dbContext.FindAsync<TEntity,TKey>(id);
         }
 
         public IQueryable<T> FilterBy(ISpecification<T> expression)
@@ -92,19 +99,19 @@ namespace Framework.Data.EF
             return FilterBy(expression.Expression);
         }
 
-        public IQueryable<T> All()
+        public IQueryable<T> Query()
         {
             return _dbContext.Query<T>();
         }
 
-        public T FindBy(Expression<Func<T, bool>> expression)
+        public T FindByAsync(Expression<Func<T, bool>> expression)
         {
             return FilterBy(expression).FirstOrDefault();
         }
 
         public IQueryable<T> FilterBy(Expression<Func<T, bool>> expression)
         {
-            return All().Where(expression);
+            return Query().Where(expression);
         }
     }
 }

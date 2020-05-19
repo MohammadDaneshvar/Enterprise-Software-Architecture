@@ -1,3 +1,6 @@
+using FluentValidation;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Framework.Application
@@ -5,16 +8,17 @@ namespace Framework.Application
     public class ValidatorCommandHandler<T> : ICommandHandler<T>
     {
         private readonly ICommandHandler<T> _decoratee;
-        private readonly IValidator validator;
+        private readonly ICommandValidator<T> _commandValidator;
 
-        public ValidatorCommandHandler(ICommandHandler<T> decoratee, IValidator validator)
+        public ValidatorCommandHandler(ICommandHandler<T> decoratee, ICommandValidator<T> validator)
         {
             _decoratee = decoratee;
-            this.validator = validator;
+            this._commandValidator = validator;
         }
         public async Task HandleAsync(T command)
         {
-            validator.Validate(command);
+            _commandValidator.Validate(command);
+
             await _decoratee.HandleAsync(command);
         }
     }

@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using AppService;
 using AppService.Config;
 using Framework.Application;
 using Framework.Application.Config;
+using Infra.Persistance.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Owin.Cors;
 using Nancy.Owin;
 using Owin;
@@ -20,6 +23,7 @@ namespace Service.Distributor
         public void Configure(IApplicationBuilder app)
         {
             app.UseOwin(x => { x.UseNancy(); });
+            
         }
     }
 
@@ -28,16 +32,21 @@ namespace Service.Distributor
         public static Container container;
         static void Main(string[] args)
         {
+            string conStr = ConfigurationManager.ConnectionStrings["FRI"].ToString();
             container = new Container();
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-            FrameworkConfigurator.WireUp(container, false, typeof(SaleAppService).Assembly);
-            AppServiceConfigurator.WireUp(container);
+            FrameworkConfigurator.WireUp(container, false, typeof(LoanAppService).Assembly);
+            AppServiceConfigurator.WireUp(container, conStr);
+            var mydb = new FRIDbContext(conStr);
+            mydb.Database.Migrate();
+
 
             var host = new WebHostBuilder()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseKestrel()
                 .UseStartup<Startup>()
                 .Build();
+
 
             host.Run();
 

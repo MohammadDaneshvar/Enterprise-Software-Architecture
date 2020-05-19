@@ -1,8 +1,8 @@
 namespace Framework.Application
 {
-    public class Validator : IValidator
+    public class CommandValidator<T> : ICommandValidator<T>
     {
-        public void Validate(object command)
+        public void Validate(T command)
         {
             
         }

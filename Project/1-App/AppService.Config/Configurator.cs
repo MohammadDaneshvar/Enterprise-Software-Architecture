@@ -1,6 +1,8 @@
 ﻿using Framework.Application;
+using Framework.Data;
 using Framework.Data.EF;
 using Framework.Domain.Repository;
+using Infra.Persistance.EF;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
@@ -28,14 +30,19 @@ namespace AppService.Config
         }
 
         [Obsolete]
-        public static void WireUp(Container container)
+        public static void WireUp(Container container,string    connectionString)
         {
             container.Register<IUnitOfWork, EFUnitOfWork>();
-            container.Register(typeof(IRepository<>), typeof(EFRepository<>));
-            container.Register(typeof(ICommandHandler<>), typeof(RemoteCommandHandler<>));
+            container.Register<IDbContext>(()=> new FRIDbContext(connectionString));
+            
+            
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CacheDecoratorCommandHandler<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ValidatorCommandHandler<>));
+            container.Register(typeof(ICommandValidator<>), typeof(CommandValidator<>));
+            
             container.Register<ICacheProvider, InMemoryCacheProvider>(Lifestyle.Singleton);
             container.Register<IKeyGenerator, KeyGenerator>();
+            container.Register(typeof(IRepository<>), typeof(EFRepository<>));
             //container.RegisterCollection(typeof(ICommandHandler<>), new List<Assembly> { typeof(SaleAppService).Assembly });
             //container.RegisterCollection(typeof(IEventHandler<>), new List<Assembly> { typeof(SaleAppService).Assembly });
             //container.Register<IServiceProvider>(() => container, Lifestyle.Singleton);

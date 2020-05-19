@@ -22,7 +22,7 @@ namespace App.Distributor
             );
 
             var commandHandlers= Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
-                new[] { typeof(SaleAppService).Assembly });
+                new[] { typeof(LoanAppService).Assembly });
             var commands =
                 commandHandlers.SelectMany(type => type.GetInterfaces())
                     .Where(type => type.IsGenericType)
@@ -61,13 +61,20 @@ namespace App.Distributor
 
         public async Task<object> MakeHandler<T>()
         {
-           
+            try
+            {
+
                 var bus = Program.container.GetInstance<ICommandBus>();
                 var command = this.Bind<T>();
                 //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
                 using (AsyncScopedLifestyle.BeginScope(Program.container))
                     await bus.DispatchAsync(command);
                 if (command is IHaveResult) return ((IHaveResult)command).Result;
+            }
+            catch( Exception e)
+            {
+                var s = e;
+            }
                 return "ok";
           
         }

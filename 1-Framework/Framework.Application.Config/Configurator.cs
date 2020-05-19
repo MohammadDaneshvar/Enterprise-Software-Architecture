@@ -20,6 +20,14 @@ namespace Framework.Application.Config
             container.Register<ICommandHandlerFactory, CommandHandlerFactory>(Lifestyle.Singleton);
             container.Register<ICommandBus, CommandBus>(Lifestyle.Singleton);
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>));
+            container.Register(typeof(ICommandHandler<>), new List<Assembly> { application });
+            
+
+
+
+
+
+
             //container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AccessValidatorCommandHandler<>), t => typeof(IRestrictedCommand).IsAssignableFrom(t.ServiceType.GetGenericArguments().First()));
 
             //container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ValidatorCommandHandler<>));

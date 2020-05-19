@@ -1,7 +1,7 @@
 namespace Framework.Application
 {
-    public interface IValidator
+    public interface ICommandValidator<T>
     {
-        void Validate(object command);
+        void Validate(T command);
     }
 }

@@ -15,9 +15,9 @@ namespace Framework.Application
         }
         public async Task HandleAsync(T command)
         {
-            _unitOfWork.BeginAsync();
+           await  _unitOfWork.BeginAsync();
             await _decoratee.HandleAsync(command);
-            _unitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync();
         }
     }
 }
