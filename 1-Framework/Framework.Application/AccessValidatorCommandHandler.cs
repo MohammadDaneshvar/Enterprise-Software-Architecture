@@ -1,3 +1,5 @@
+using FluentValidation;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Framework.Application
@@ -14,8 +16,14 @@ namespace Framework.Application
         }
         public async Task HandleAsync(T command)
         {
-            validator.Validate(command);
-            await _decoratee.HandleAsync(command);
+            var results= validator.Validate(command);
+            if (results.IsValid)
+                await _decoratee.HandleAsync(command);
+            else
+            {
+                var failures= results.Errors.Where(f => f != null).ToList();
+                throw new ValidationException(failures);
+            }
         }
     }
 }

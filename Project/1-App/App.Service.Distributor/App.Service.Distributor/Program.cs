@@ -10,9 +10,9 @@ using Infra.Persistance.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Owin.Cors;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Nancy.Owin;
-using Owin;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
@@ -20,7 +20,21 @@ namespace Service.Distributor
 {
     public class Startup
     {
-        public void Configure(IApplicationBuilder app)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            Configuration = configuration;
+            Environment = environment;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Environment { get; }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+        }
+
+            public void Configure(IApplicationBuilder app)
         {
             app.UseOwin(x => { x.UseNancy(); });
             

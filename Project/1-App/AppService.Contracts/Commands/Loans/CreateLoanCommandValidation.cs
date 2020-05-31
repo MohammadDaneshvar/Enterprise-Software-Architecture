@@ -1,15 +1,18 @@
-﻿using Framework.Application;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Framework.Application;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AppService.Contracts.Commands.Loans
 {
-    public class CreateLoanCommandValidation<CreateLoanCommand> : ICommandValidator<CreateLoanCommand>
+    public class CreateLoanCommandValidation<CreateLoanCommand> :AbstractValidator<CreateLoanCommand>  , ICommandValidator<CreateLoanCommand>
     {
-        public void Validate(CreateLoanCommand command)
+        public ValidationResult Validate(CreateLoanCommand command)
         {
-           // throw new NotImplementedException();
+            var results = base.Validate(command);
+            return results;
         }
     }
 }

@@ -1,7 +1,11 @@
+
+
+using FluentValidation.Results;
+
 namespace Framework.Application
 {
     public interface ICommandValidator<T>
     {
-        void Validate(T command);
+        ValidationResult Validate(T command);
     }
 }

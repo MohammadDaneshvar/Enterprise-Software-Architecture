@@ -3,8 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AppService;
 using Framework.Application;
+using Microsoft.AspNetCore.Server.IIS.Core;
+using Microsoft.AspNetCore.SignalR;
 using Nancy;
 using Nancy.ModelBinding;
+using Nancy.Security;
 using Service.Distributor;
 using SimpleInjector.Lifestyles;
 
@@ -20,7 +23,7 @@ namespace App.Distributor
                     .WithHeader("Access-Control-Allow-Methods", "POST,GET")
                     .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type")
             );
-
+            var s=this.Context.CurrentUser.Identity.IsAuthenticated;
             var commandHandlers= Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
                 new[] { typeof(LoanAppService).Assembly });
             var commands =
@@ -63,8 +66,14 @@ namespace App.Distributor
         {
             try
             {
-
-                var bus = Program.container.GetInstance<ICommandBus>();
+                
+                var isAuthenticated = false;
+                Before.AddItemToEndOfPipeline(ctx =>
+                {
+                    isAuthenticated= ctx.CurrentUser.IsAuthenticated();
+                    return null;
+                });
+                 var bus = Program.container.GetInstance<ICommandBus>();
                 var command = this.Bind<T>();
                 //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
                 using (AsyncScopedLifestyle.BeginScope(Program.container))
