@@ -38,7 +38,7 @@ namespace AppService.Config
             
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CacheDecoratorCommandHandler<>));
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ValidatorCommandHandler<>));
-            container.Register(typeof(ICommandValidator<>), typeof(CommandValidator<>));
+            //container.Register(typeof(ICommandValidator<>), typeof(CommandValidator<>));
             
             container.Register<ICacheProvider, InMemoryCacheProvider>(Lifestyle.Singleton);
             container.Register<IKeyGenerator, KeyGenerator>();

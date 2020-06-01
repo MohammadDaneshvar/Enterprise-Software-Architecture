@@ -23,7 +23,7 @@ namespace App.Distributor
                     .WithHeader("Access-Control-Allow-Methods", "POST,GET")
                     .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type")
             );
-            var s=this.Context.CurrentUser.Identity.IsAuthenticated;
+            //var s=this.Context.CurrentUser.Identity.IsAuthenticated;
             var commandHandlers= Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
                 new[] { typeof(LoanAppService).Assembly });
             var commands =

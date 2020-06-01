@@ -9,7 +9,7 @@ namespace AppService.Contracts.Commands.Loans
 {
     public class CreateLoanCommandValidation<CreateLoanCommand> :AbstractValidator<CreateLoanCommand>  , ICommandValidator<CreateLoanCommand>
     {
-        public ValidationResult Validate(CreateLoanCommand command)
+        public new ValidationResult Validate(CreateLoanCommand command)
         {
             var results = base.Validate(command);
             return results;

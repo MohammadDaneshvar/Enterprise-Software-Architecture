@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Contracts", "Project
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Query", "Project\1-Domain\Domain.Query\Domain.Query.csproj", "{1C1A7E58-B677-4E55-8E9C-99D66AB59205}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppService.Query", "Project\1-App\AppService.Query\AppService.Query.csproj", "{FE6124A1-C281-47A1-8473-23DEFC1BC44C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppService.Query", "Project\1-App\AppService.Query\AppService.Query.csproj", "{FE6124A1-C281-47A1-8473-23DEFC1BC44C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

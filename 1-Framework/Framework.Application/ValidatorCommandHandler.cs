@@ -17,8 +17,12 @@ namespace Framework.Application
         }
         public async Task HandleAsync(T command)
         {
-            _commandValidator.Validate(command);
-
+           var results=   _commandValidator.Validate(command);
+            if (!results.IsValid)
+            {
+                var failures = results.Errors.Where(f => f != null).ToList();
+                throw new ValidationException(failures);
+            }
             await _decoratee.HandleAsync(command);
         }
     }
