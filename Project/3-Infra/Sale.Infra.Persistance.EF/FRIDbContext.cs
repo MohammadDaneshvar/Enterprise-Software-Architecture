@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infra.Persistance.EF
@@ -30,24 +31,25 @@ namespace Infra.Persistance.EF
 
         }
 
-        public async Task BeginAsync()
+        public async Task BeginAsync(CancellationToken cancellationToken = default)
         {
-            await Database.BeginTransactionAsync();
+            await Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task CommitAsync()
+        public  void Commit()
         {
             Database.CommitTransaction();
         }
 
-        public async Task RollbackAsync()
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            await Database.BeginTransactionAsync();
+            await Database.BeginTransactionAsync(cancellationToken);
+            
         }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken= default)
         {
-            var result = await SaveChangesAsync();
+            var result = await SaveChangesAsync(cancellationToken);
             return result;
         }
         private static DbContextOptions GetOptions(string connectionString)
@@ -72,24 +74,24 @@ namespace Infra.Persistance.EF
 
 
 
-        public IQueryable<T> Query<T>() where T : class
+        public new IQueryable<T> Query<T>() where T : class
         {
             return base.Query<T>();
         }
 
-        public async Task AddRangeAsync<T>(IEnumerable<T> items) where T : class
+        public async Task AddRangeAsync<T>(IEnumerable<T> items, CancellationToken cancellationToken = default) where T : class
         {
-            await base.AddRangeAsync(items);
+            await base.AddRangeAsync(items, cancellationToken);
         }
 
-        public async Task AddAsync<T>(T entity) where T : class
+        public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            await base.AddAsync(entity);
+            await base.AddAsync(entity, cancellationToken);
         }
 
-        public new async Task<TEntity> FindAsync<TEntity, TKey>(TKey id) where TEntity : class
+        public new async Task<TEntity> FindAsync<TEntity, TKey>(TKey id, CancellationToken cancellationToken = default) where TEntity : class
         {
-            return await base.FindAsync<TEntity>(id);
+            return await base.FindAsync<TEntity>(id, cancellationToken);
         }
     }
 }

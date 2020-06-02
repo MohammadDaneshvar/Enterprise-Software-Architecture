@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Framework.Application
@@ -10,9 +11,9 @@ namespace Framework.Application
         {
             _factory = factory;
         }
-        public async Task DispatchAsync<T>(T command)
+        public async Task DispatchAsync<T>(T command, CancellationToken cancellationToken )
         {
-            await _factory.CreateHandler<T>().HandleAsync(command);
+            await _factory.CreateHandler<T>().HandleAsync(command, cancellationToken);
         }
     }
 }

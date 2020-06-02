@@ -1,6 +1,7 @@
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -11,7 +12,7 @@ namespace Framework.Application
         public RemoteCommandHandler()
         {
         }
-        public async Task HandleAsync(T command)
+        public async Task HandleAsync(T command, CancellationToken cancellationToken)
         {
             var address = new Uri($"http://{"localhost"}:{"228"}/{command.GetType().Name}");
             var basicHttpBinding = new BasicHttpBinding { MaxReceivedMessageSize = 2147483647 };

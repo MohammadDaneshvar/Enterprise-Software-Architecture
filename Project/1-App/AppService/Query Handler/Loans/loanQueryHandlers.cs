@@ -3,6 +3,7 @@ using AppService.Contracts.Queries;
 using System.Threading.Tasks;
 using AppService.Query.Finders.Loans;
 using AppService.Contracts.Queries.Loans;
+using System.Threading;
 
 namespace AppService.Queries
 {
@@ -14,7 +15,7 @@ namespace AppService.Queries
         {
             _loanFinder = loanFinder;
         }
-        public async Task HandleAsync(GetLoanByPersonIdQuery command) => command.Result = _loanFinder.FindByPersonIdAsync(command.Id);
+        public async Task HandleAsync(GetLoanByPersonIdQuery command, CancellationToken cancellationToken) => command.Result = _loanFinder.FindByPersonIdAsync(command.Id);
 
     }
 }

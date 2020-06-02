@@ -1,6 +1,7 @@
 using FluentValidation;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Framework.Application
@@ -15,7 +16,7 @@ namespace Framework.Application
             _decoratee = decoratee;
             this._commandValidator = validator;
         }
-        public async Task HandleAsync(T command)
+        public async Task HandleAsync(T command, CancellationToken cancellationToken)
         {
            var results=   _commandValidator.Validate(command);
             if (!results.IsValid)
@@ -23,7 +24,7 @@ namespace Framework.Application
                 var failures = results.Errors.Where(f => f != null).ToList();
                 throw new ValidationException(failures);
             }
-            await _decoratee.HandleAsync(command);
+            await _decoratee.HandleAsync(command, cancellationToken);
         }
     }
 }

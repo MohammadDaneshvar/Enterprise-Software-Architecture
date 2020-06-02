@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Framework.Application
@@ -14,12 +15,12 @@ namespace Framework.Application
             _keyGenerator = keyGenerator;
             _decoratee = decoratee;
         }
-        public async Task HandleAsync(T command)
+        public async Task HandleAsync(T command, CancellationToken cancellationToken)
         {
             var key = _keyGenerator.GenerateKeyForCache(command);
             if (string.IsNullOrEmpty(key))
             {
-                await _decoratee.HandleAsync(command);
+                await _decoratee.HandleAsync(command, cancellationToken);
                 return;
             }
             var result = await cacheProvider.GetAsync(key);
@@ -27,7 +28,7 @@ namespace Framework.Application
                 ((IHaveResult)command).Result = result;
             else
             {
-                await _decoratee.HandleAsync(command);
+                await _decoratee.HandleAsync(command, cancellationToken);
                 await cacheProvider.AddAsync(key, ((IHaveResult)command).Result);
 
             }

@@ -32,7 +32,9 @@ namespace App.Distributor
                     .Select(type => type.GetGenericArguments().First());
             foreach (var command in commands)
             {
-                var address = $"/{command.Name}";
+
+                var serviceName = command.Namespace.Split('.').LastOrDefault();
+                var address = $"/{serviceName}/{command.Name}";
                 var makeHandler = this.GetType().GetMethod("MakeHandler", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
                     .MakeGenericMethod(command);
                 //    //     Get["/"] = parameters => "Hello World!";

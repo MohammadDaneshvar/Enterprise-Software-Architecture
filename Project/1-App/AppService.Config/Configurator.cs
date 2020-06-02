@@ -29,7 +29,7 @@ namespace AppService.Config
             }
         }
 
-        [Obsolete]
+        //[Obsolete]
         public static void WireUp(Container container,string    connectionString)
         {
             container.Register<IUnitOfWork, EFUnitOfWork>();

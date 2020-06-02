@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Framework.Data.EF
@@ -10,23 +11,23 @@ namespace Framework.Data.EF
         {
             _dbContext = dbContext;
         }
-        public async Task BeginAsync()
+        public async Task BeginAsync(CancellationToken cancellationToken = default)
         {
-            await _dbContext.BeginAsync();
+            await _dbContext.BeginAsync(cancellationToken);
         }
 
-        public async Task CommitAsync()
+        public  void Commit()
         {
-            await _dbContext.CommitAsync();
+            _dbContext.Commit();
         }
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.SaveChangesAsync();
+            return await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task RollbackAsync()
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-          await   _dbContext.RollbackAsync();
+          await   _dbContext.RollbackAsync(cancellationToken);
         }
 
   

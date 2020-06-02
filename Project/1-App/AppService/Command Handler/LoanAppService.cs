@@ -7,6 +7,7 @@ using Framework.Data.EF;
 using AppService.Contracts.Commands.Loans;
 using Domain.Logs;
 using Domain.Person;
+using System.Threading;
 
 namespace AppService
 {
@@ -26,7 +27,7 @@ namespace AppService
         //    order.SetOrderLines(lines.Select(dto => new OrderLine(dto.ProductId,dto.Quantity)).ToList());
         //    _orderRepository.Add(order);
         //}
-        public async Task HandleAsync(CreateLoanCommand command)
+        public async Task HandleAsync(CreateLoanCommand command, CancellationToken cancellationToken )
         {
              await _logRepository.AddAsync(new Log
             {
