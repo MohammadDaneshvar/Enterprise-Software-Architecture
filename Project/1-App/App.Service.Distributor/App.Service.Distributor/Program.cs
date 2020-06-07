@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AppService;
 using AppService.Config;
+using AppService.Contracts;
 using Framework.Application;
 using Framework.Application.Config;
 using Infra.Persistance.EF;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Nancy.Owin;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
-
 namespace Service.Distributor
 {
     public class Startup
@@ -32,12 +32,25 @@ namespace Service.Distributor
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "http://localhost:5000";
+                    options.RequireHttpsMetadata = false;
+
+                    options.Audience = "api1";
+                });
+            services.AddAuthorization();
         }
 
-            public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseOwin(x => { x.UseNancy(); });
-            
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
+
         }
     }
 
@@ -48,8 +61,9 @@ namespace Service.Distributor
         {
             string conStr = ConfigurationManager.ConnectionStrings["FRI"].ToString();
             container = new Container();
+            
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-            FrameworkConfigurator.WireUp(container, false, typeof(LoanAppService).Assembly);
+            FrameworkConfigurator.WireUp(container, false, typeof(LoanAppService).Assembly, typeof(CreateLoanCommand).Assembly);
             AppServiceConfigurator.WireUp(container, conStr);
             var mydb = new FRIDbContext(conStr);
             mydb.Database.Migrate();
@@ -59,6 +73,7 @@ namespace Service.Distributor
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseKestrel()
                 .UseStartup<Startup>()
+                .UseUrls("http://localhost:5005/")
                 .Build();
 
 

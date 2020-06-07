@@ -4,7 +4,7 @@ using Framework.Domain.Repository;
 using AppService.Contracts;
 using System.Threading.Tasks;
 using Framework.Data.EF;
-using AppService.Contracts.Commands.Loans;
+using AppService.Contracts;
 using Domain.Logs;
 using Domain.Person;
 using System.Threading;
@@ -32,7 +32,9 @@ namespace AppService
              await _logRepository.AddAsync(new Log
             {
                 MessageType = command.PersonId.ToString()
+
             }); ;
+            
             //var order = new Order(command.CustomerId);
             //order.SetOrderLines(command.OrderLines.Select(dto => new OrderLine(dto.ProductId, dto.Quantity)).ToList());
             //_orderRepository.Add(order);

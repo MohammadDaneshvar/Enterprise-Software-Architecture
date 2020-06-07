@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AppService.Contracts.Commands.Loans
+namespace AppService.Contracts
 {
     public class CreateLoanCommand : IRestrictedCommand
     {

@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AppService.Contracts.Commands.Loans
+namespace AppService.Contracts
 {
-    public class CreateLoanCommandValidation<CreateLoanCommand> :AbstractValidator<CreateLoanCommand>  , ICommandValidator<CreateLoanCommand>
+    public class CreateLoanCommandValidation : AbstractValidator<CreateLoanCommand>, ICommandValidator<CreateLoanCommand>
     {
         public new ValidationResult Validate(CreateLoanCommand command)
         {

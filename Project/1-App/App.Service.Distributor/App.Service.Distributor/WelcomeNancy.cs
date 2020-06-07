@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AppService;
+using AppService.Contracts;
 using Framework.Application;
 using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.AspNetCore.SignalR;
 using Nancy;
+using Nancy.Json;
 using Nancy.ModelBinding;
 using Nancy.Security;
 using Service.Distributor;
@@ -15,8 +17,14 @@ namespace App.Distributor
 {
     public class WelcomeModule : NancyModule
     {
+        private readonly IServiceProvider serviceProvider;
+
         public WelcomeModule()
         {
+            this.RequiresAuthentication();
+            
+
+
             After.AddItemToEndOfPipeline((context) =>
                 context.Response
                     .WithHeader("Access-Control-Allow-Origin", "*")
@@ -24,7 +32,7 @@ namespace App.Distributor
                     .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type")
             );
             //var s=this.Context.CurrentUser.Identity.IsAuthenticated;
-            var commandHandlers= Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
+            var commandHandlers = Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
                 new[] { typeof(LoanAppService).Assembly });
             var commands =
                 commandHandlers.SelectMany(type => type.GetInterfaces())
@@ -52,7 +60,7 @@ namespace App.Distributor
                 //    return result;
                 //});
 
-                
+
 
                 Get(address, async x => await (Task<object>)makeHandler.Invoke(this, new object[0]));
                 Post(address, async x => await (Task<object>)makeHandler.Invoke(this, new object[0]));
@@ -61,33 +69,38 @@ namespace App.Distributor
                 //Get(address,  x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
                 //Post(address,  x => (Func<object, object>)makeHandler.Invoke(this, new object[0]));
             }
-    }
+
+            this.serviceProvider = serviceProvider;
+        }
 
 
         public async Task<object> MakeHandler<T>()
         {
             try
             {
-                
+
                 var isAuthenticated = false;
                 Before.AddItemToEndOfPipeline(ctx =>
                 {
-                    isAuthenticated= ctx.CurrentUser.IsAuthenticated();
+                    isAuthenticated = ctx.CurrentUser.IsAuthenticated();
                     return null;
                 });
-                 var bus = Program.container.GetInstance<ICommandBus>();
+                var bus = Program.container.GetInstance<ICommandBus>();
                 var command = this.Bind<T>();
                 //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
                 using (AsyncScopedLifestyle.BeginScope(Program.container))
                     await bus.DispatchAsync(command);
                 if (command is IHaveResult) return ((IHaveResult)command).Result;
             }
-            catch( Exception e)
+            catch (Exception e)
             {
                 var s = e;
             }
-                return "ok";
-          
+
+            return  new Response
+            {
+                StatusCode = HttpStatusCode.OK,
+            };
         }
 
 
