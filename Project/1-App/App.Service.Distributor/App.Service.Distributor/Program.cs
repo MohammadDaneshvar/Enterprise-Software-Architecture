@@ -5,6 +5,7 @@ using System.Linq;
 using AppService;
 using AppService.Config;
 using AppService.Contracts;
+using FluentAssertions.Common;
 using Framework.Application;
 using Framework.Application.Config;
 using Infra.Persistance.EF;
@@ -13,25 +14,30 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Nancy.Owin;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
+using AppService.Query;
+using App.Service.Distributor.Common;
+using Microsoft.Extensions.Hosting;
+
 namespace Service.Distributor
 {
     public class Startup
     {
+        private IConfiguration _configuration { get; }
+
+        private IWebHostEnvironment _environment { get; }
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            Configuration = configuration;
-            Environment = environment;
+            _configuration = configuration;
+            _environment = environment;
         }
-
-        public IConfiguration Configuration { get; }
-
-        public IWebHostEnvironment Environment { get; }
-
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddInfrastructure(_configuration,true);
+            services.AddServiceQuery(_configuration, true);
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
@@ -41,16 +47,46 @@ namespace Service.Distributor
                     options.Audience = "api1";
                 });
             services.AddAuthorization();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+            services.AddRouting();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseOwin(x => { x.UseNancy(); });
             app.UseAuthentication();
             app.UseAuthorization();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                //app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+            app.UseCustomExceptionHandler();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            app.UseHealthChecks("/health");
+            app.UseHttpsRedirection();
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
-
-
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 
@@ -61,12 +97,12 @@ namespace Service.Distributor
         {
             string conStr = ConfigurationManager.ConnectionStrings["FRI"].ToString();
             container = new Container();
-            
+
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             FrameworkConfigurator.WireUp(container, false, typeof(LoanAppService).Assembly, typeof(CreateLoanCommand).Assembly);
-            AppServiceConfigurator.WireUp(container, conStr);
-            var mydb = new FRIDbContext(conStr);
-            mydb.Database.Migrate();
+            AppServiceConfigurator.WireUp(container);
+            //var mydb = new FRIDbContext(conStr);
+            //mydb.Database.Migrate();
 
 
             var host = new WebHostBuilder()

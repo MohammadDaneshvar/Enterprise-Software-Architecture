@@ -1,4 +1,5 @@
-﻿using Framework.Application;
+﻿using AppService.Query.Finders.Loans;
+using Framework.Application;
 using Framework.Data;
 using Framework.Data.EF;
 using Framework.Domain.Repository;
@@ -30,12 +31,13 @@ namespace AppService.Config
         }
 
         //[Obsolete]
-        public static void WireUp(Container container,string    connectionString)
+        public static void WireUp(Container container)
         {
             container.Register<IUnitOfWork, EFUnitOfWork>();
-            container.Register<IDbContext>(()=> new FRIDbContext(connectionString));
-            
-            
+            container.Register<IDbContext>(()=> new FRIDbContext());
+            //container.Register<IDbContext,FRIDbContext>();
+
+
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CacheDecoratorCommandHandler<>));
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ValidatorCommandHandler<>));
             //container.Register(typeof(ICommandValidator<>), typeof(CommandValidator<>));
@@ -43,6 +45,10 @@ namespace AppService.Config
             container.Register<ICacheProvider, InMemoryCacheProvider>(Lifestyle.Singleton);
             container.Register<IKeyGenerator, KeyGenerator>();
             container.Register(typeof(IRepository<>), typeof(EFRepository<>));
+            
+            //----------------------------Finder
+
+            container.Register<ILoanFinder, LoanFinder>();
             //container.RegisterCollection(typeof(ICommandHandler<>), new List<Assembly> { typeof(SaleAppService).Assembly });
             //container.RegisterCollection(typeof(IEventHandler<>), new List<Assembly> { typeof(SaleAppService).Assembly });
             //container.Register<IServiceProvider>(() => container, Lifestyle.Singleton);

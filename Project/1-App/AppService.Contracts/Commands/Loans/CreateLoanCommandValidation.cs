@@ -7,7 +7,7 @@ using System.Text;
 
 namespace AppService.Contracts
 {
-    public class CreateLoanCommandValidation : AbstractValidator<CreateLoanCommand>, ICommandValidator<CreateLoanCommand>
+    public class GetLoanByPersonIdQueryValidation : AbstractValidator<CreateLoanCommand>, ICommandValidator<CreateLoanCommand>
     {
         public new ValidationResult Validate(CreateLoanCommand command)
         {

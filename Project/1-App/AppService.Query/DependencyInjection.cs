@@ -5,16 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Infra.Persistance.EF
+namespace AppService.Query
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isTestEnvironment)
+        public static IServiceCollection AddServiceQuery(this IServiceCollection services, IConfiguration configuration, bool isTestEnvironment)
         {
-            services.AddDbContext<FRIDbContext>(options =>
+            services.AddDbContext<FRIQueryDbContext>(options =>
                 options.UseSqlServer(
                     configuration.GetConnectionString("FRIQuery"),
-                    b => b.MigrationsAssembly(typeof(FRIDbContext).Assembly.FullName)));
+                    b => b.MigrationsAssembly(typeof(FRIQueryDbContext).Assembly.FullName)));
 
             //services.AddScoped<IFRIDbContext>(provider => provider.GetService<FRIDbContext>());
 

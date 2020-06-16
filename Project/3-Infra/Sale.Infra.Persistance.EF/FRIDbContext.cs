@@ -15,21 +15,25 @@ namespace Infra.Persistance.EF
     public class FRIDbContext : DbContext, IDbContext
     {
         public DbSet<Log> Logs { get; set; }
-        public FRIDbContext():base(GetOptions("Data Source=.;Initial Catalog=FRI;User ID=sa;Password=123456"))
+        //public FRIDbContext():base(GetOptions("Data Source=.;Initial Catalog=FRI;User ID=sa;Password=123456"))
+        //{
+
+        //}
+        public FRIDbContext(DbContextOptions options) : base(options)
         {
 
         }
-        public FRIDbContext(string connectionString) : base(GetOptions(connectionString))
+        public FRIDbContext()
         {
 
         }
-        protected internal virtual void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(FRIDbContext).Assembly); // Here UseConfiguration is any IEntityTypeConfiguration
-            modelBuilder.ApplyConfiguration(new LogConfiguration());
+        //protected internal virtual void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
+        //    modelBuilder.ApplyConfigurationsFromAssembly(typeof(FRIDbContext).Assembly); // Here UseConfiguration is any IEntityTypeConfiguration
+        //    modelBuilder.ApplyConfiguration(new LogConfiguration());
 
-        }
+        //}
 
         public async Task BeginAsync(CancellationToken cancellationToken = default)
         {

@@ -13,6 +13,7 @@ namespace Framework.Application.Config
 {
     public class FrameworkConfigurator
     {
+
         public static void WireUp(Container container, bool runAsClient, Assembly application, Assembly contracts)
         {
             container.Register<IServiceProvider>(() => container, Lifestyle.Singleton);
@@ -21,7 +22,7 @@ namespace Framework.Application.Config
             container.Register<ICommandBus, CommandBus>(Lifestyle.Singleton);
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>));
             container.Register(typeof(ICommandHandler<>), new List<Assembly> { application });
-            container.Register(typeof(ICommandValidator<>), new List<Assembly> { contracts});
+            container.Register(typeof(ICommandValidator<>), new List<Assembly> { contracts });
 
 
 
@@ -37,7 +38,7 @@ namespace Framework.Application.Config
             //            , Lifestyle.Scoped);
             //container.Register<IValidator, Validator>();
             container.Register<IEventHandlerFactory, EventHandlerFactory>(Lifestyle.Singleton);
-            container.RegisterCollection(typeof(IEventHandler<>), new List<Assembly> { application });
+            container.Collection.Register(typeof(IEventHandler<>), new List<Assembly> { application });
         }
     }
 }

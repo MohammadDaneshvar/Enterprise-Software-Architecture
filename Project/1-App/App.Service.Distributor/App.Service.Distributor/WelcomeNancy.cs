@@ -22,8 +22,8 @@ namespace App.Distributor
         public WelcomeModule()
         {
             this.RequiresAuthentication();
-            
 
+            
 
             After.AddItemToEndOfPipeline((context) =>
                 context.Response
@@ -31,6 +31,7 @@ namespace App.Distributor
                     .WithHeader("Access-Control-Allow-Methods", "POST,GET")
                     .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type")
             );
+    
             //var s=this.Context.CurrentUser.Identity.IsAuthenticated;
             var commandHandlers = Program.container.GetTypesToRegister(typeof(ICommandHandler<>),
                 new[] { typeof(LoanAppService).Assembly });
@@ -79,14 +80,16 @@ namespace App.Distributor
             try
             {
 
-                var isAuthenticated = false;
-                Before.AddItemToEndOfPipeline(ctx =>
-                {
-                    isAuthenticated = ctx.CurrentUser.IsAuthenticated();
-                    return null;
-                });
+
+                //Before.AddItemToEndOfPipeline(ctx =>
+                //{
+                //    isAuthenticated = ctx.CurrentUser.IsAuthenticated();
+                //    return null;
+                //});
+                
                 var bus = Program.container.GetInstance<ICommandBus>();
-                var command = this.Bind<T>();
+                var command = (IRestrictedCommand)  this.Bind<T>();
+                this.Context.CurrentUser.IsInRole(command.Roles);
                 //bindTo.MakeGenericMethod(commandType).Invoke(null, new object[] {this, command});
                 using (AsyncScopedLifestyle.BeginScope(Program.container))
                     await bus.DispatchAsync(command);

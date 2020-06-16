@@ -11,9 +11,9 @@ namespace AppService.Query.Finders.Loans
     {
         private readonly FRIQueryDbContext _dbContext;
 
-        public LoanFinder(FRIQueryDbContext dbContext)
+        public LoanFinder()
         {
-            _dbContext = dbContext;
+            _dbContext =new FRIQueryDbContext();
         }
 
         public async Task<Contract> FindByPersonIdAsync(long personId)
