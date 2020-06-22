@@ -7,7 +7,7 @@ using System.Text;
 
 namespace AppService.Contracts.Queries.Loans
 {
-    public class GetLoanByPersonIdQueryValidation : AbstractValidator<GetLoanByPersonIdQuery>, ICommandValidator<GetLoanByPersonIdQuery>
+    public class GetLoanByPersonIdQueryValidation<T> : AbstractValidator<GetLoanByPersonIdQuery<T>>, ICommandValidator<GetLoanByPersonIdQuery<T>>
     {
      
     }

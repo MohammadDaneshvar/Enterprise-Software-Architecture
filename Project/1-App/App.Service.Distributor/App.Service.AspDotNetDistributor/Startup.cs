@@ -15,21 +15,23 @@ using SimpleInjector.Lifestyles;
 using Infra.Persistance.EF;
 using AppService.Query;
 using SimpleInjector.Integration.ServiceCollection;
+using SimpleInjector.Integration.Web.Mvc;
+using System.Web.Mvc;
+using Framework.Application;
+using Framework.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace DynamicAndGenericControllersSample
 {
     public class Startup
     {
-        private  Container _serviceProvider;
-
+        public static Container _container;
         public Startup(IConfiguration configuration)
         {
-
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            _container = new SimpleInjector.Container();
             _configuration = configuration;
-
-
-
-
+            // Set to false. This will be the default in v5.x and going forward.
+            _container.Options.ResolveUnregisteredConcreteTypes = false;
         }
 
         private IConfiguration _configuration { get; }
@@ -37,12 +39,32 @@ namespace DynamicAndGenericControllersSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            _serviceProvider = new Container();
-            services.AddSimpleInjector(_serviceProvider);
-            services.BuildServiceProvider(validateScopes: true)
-                .UseSimpleInjector(_serviceProvider);
-            
-            services.AddSingleton(typeof(Storage<>));
+            services.AddInfrastructure(_configuration, true);
+            services.AddServiceQuery(_configuration, true);
+            services.AddSimpleInjector(_container
+         //, options =>
+         //   {
+
+         //       options.AddAspNetCore()
+
+         //// Ensure activation of a specific framework type to be created by
+         //// Simple Injector instead of the built-in configuration system.
+         //// All calls are optional. You can enable what you need. For instance,
+         //// ViewComponents, PageModels, and TagHelpers are not needed when you
+         //// build a Web API.
+         //.AddControllerActivation()
+         //.AddViewComponentActivation()
+         //.AddPageModelActivation()
+         //.AddTagHelperActivation();
+
+         //       // Optionally, allow application components to depend on the non-generic
+         //       // ILogger (Microsoft.Extensions.Logging) or IStringLocalizer
+         //       // (Microsoft.Extensions.Localization) abstractions.
+         //       options.AddLogging();
+         //       options.AddLocalization();
+         //   }
+         );
+            InitializeContainer();
             services.
                 AddMvc(o =>
                 {
@@ -51,7 +73,7 @@ namespace DynamicAndGenericControllersSample
                 }
                     ).
                 //ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
-                ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new RemoteControllerFeatureProvider(_serviceProvider)));
+                ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new RemoteControllerFeatureProvider(_container)));
 
 
             services.AddInfrastructure(_configuration, true);
@@ -59,18 +81,45 @@ namespace DynamicAndGenericControllersSample
 
         }
 
+        private void InitializeContainer()
+        {
+            // Add application services. For instance:
+            //   _container.Register<ICommandBus, CommandBus>(Lifestyle.Singleton);
+            FrameworkConfigurator.WireUp(_container, false, typeof(LoanAppService).Assembly, typeof(CreateLoanCommand).Assembly);
+            AppServiceConfigurator.WireUp(_container);
+
+
+            // options.UseSqlServer(
+            ////        configuration.GetConnectionString("FRIQuery"),
+            ////        b => b.MigrationsAssembly(typeof(FRIDbContext).Assembly.FullName)));
+
+            var reg = Lifestyle.Scoped.CreateRegistration(() =>
+            {
+                return new FRIDbContext(new DbContextOptionsBuilder<FRIDbContext>().UseSqlServer(_configuration.GetConnectionString("FRIQuery")).Options);
+            },  _container);
+
+            _container.AddRegistration<IDbContext>(reg);
+            //_container.Register<IDbContext>(() =>
+            //{
+            //    return new FRIDbContext(new DbContextOptionsBuilder<FRIDbContext>().UseSqlServer(_configuration.GetConnectionString("FRIQuery")).Options);
+            //});
+        }
+
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSimpleInjector(_container);
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             //app.UseSimpleInjector(_serviceProvider);
-            FrameworkConfigurator.WireUp(_serviceProvider, false, typeof(LoanAppService).Assembly, typeof(CreateLoanCommand).Assembly);
-            AppServiceConfigurator.WireUp(_serviceProvider);
-            _serviceProvider.Verify();
+
+            _container.Verify();
             app.UseMvc();
         }
     }

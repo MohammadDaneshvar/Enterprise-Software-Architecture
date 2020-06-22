@@ -1,7 +1,7 @@
 namespace Framework.Application
 {
-    public interface IHaveResult
+    public interface IHaveResult<T>
     {
-        object Result { get; set; }
+        T Result { get; set; }
     }
 }

@@ -20,14 +20,14 @@ namespace Framework.Application
             var factory = new ChannelFactory<ICommandHandlerService<T>>(basicHttpBinding, new EndpointAddress(address));
             var client = factory.CreateChannel();
             var result = await client.SendAsync(command);
-            if (result != null)
-            {
-                ((IHaveResult)command).Result = JsonConvert.DeserializeObject(result, new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
-            }
+            //if (result != null)
+            //{
+            //    ((IHaveResult)command).Result = JsonConvert.DeserializeObject(result, new JsonSerializerSettings()
+            //    {
+            //        TypeNameHandling = TypeNameHandling.All,
+            //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            //    });
+            //}
         }
     }
 

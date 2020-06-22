@@ -24,14 +24,14 @@ namespace Framework.Application
                 return;
             }
             var result = await cacheProvider.GetAsync(key);
-            if (result != null)
-                ((IHaveResult)command).Result = result;
-            else
-            {
+            //if (result != null)
+            //    ((IHaveResult)command).Result = result;
+            //else
+            //{
                 await _decoratee.HandleAsync(command, cancellationToken);
-                await cacheProvider.AddAsync(key, ((IHaveResult)command).Result);
+            //    await cacheProvider.AddAsync(key, ((IHaveResult)command).Result);
 
-            }
+            //}
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleInjector;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -11,10 +12,20 @@ namespace Infra.Persistance.EF
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isTestEnvironment)
         {
-            services.AddDbContext<FRIDbContext>(options =>
-                options.UseSqlServer(
-                    configuration.GetConnectionString("FRIQuery"),
-                    b => b.MigrationsAssembly(typeof(FRIDbContext).Assembly.FullName)));
+    //        var provider =(Container) services.BuildServiceProvider();
+    //        var reg = Lifestyle.Scoped.CreateRegistration(() =>
+    //        {
+    //            var optionsBuilder =
+    //                new DbContextOptionsBuilder<FRIDbContext>().UseSqlServer("FRIQuery");
+    //            return new FRIDbContext(optionsBuilder.Options);
+    //        },
+    //provider);
+
+
+            //services.AddDbContext<FRIDbContext>(options =>
+            //    options.UseSqlServer(
+            //        configuration.GetConnectionString("FRIQuery"),
+            //        b => b.MigrationsAssembly(typeof(FRIDbContext).Assembly.FullName)));
 
             //services.AddScoped<IFRIDbContext>(provider => provider.GetService<FRIDbContext>());
 

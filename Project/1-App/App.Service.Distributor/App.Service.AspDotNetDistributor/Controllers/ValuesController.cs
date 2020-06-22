@@ -7,46 +7,53 @@ using System.Threading.Tasks;
 using Framework.Application;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
+using AppService.Common;
+using Framework.Application.Common.Extentions;
+using Framework.Data.EF;
+using System.Reflection;
 
 namespace DynamicAndGenericControllersSample.Controllers
 {
     [Route("api/[controller]")]
-    public class BaseController<T> : Controller where T : class
+    public class BaseController<T> : Controller where T : IRestrictedCommand
     {
-        private Storage<T> _storage;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICommandBus _commandBus;
 
         public BaseController(IServiceProvider serviceProvider)
         {
-            this._serviceProvider = serviceProvider;
+            this._serviceProvider = Startup._container;
+            this._commandBus = _serviceProvider.GetService<ICommandBus>();
         }
         [HttpGet]
         public async Task<IActionResult> GetAsync(T command)
         {
-            var result= await MakeHandler(command);
-            return  result;
+            var result = await MakeHandlerAsync(command);
+            return result;
         }
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(T command)
         {
-            var result = await MakeHandler(command);
+            var result = await MakeHandlerAsync(command);
             return result;
         }
 
-        public async Task<IActionResult> MakeHandler(T command )
+        public async Task<IActionResult> MakeHandlerAsync(T command)
         {
-            IActionResult result =null;
+            IActionResult result = null;
             try
             {
-                var s = _serviceProvider.GetService(typeof( IServiceProvider));
-                var bus =(ICommandBus) _serviceProvider.GetService(typeof(ICommandBus));
-                using (AsyncScopedLifestyle.BeginScope((Container) _serviceProvider))
-                    await bus.DispatchAsync(command);
-                if (command is IHaveResult)
-                    result = Ok(((IHaveResult)command).Result);
+                using (AsyncScopedLifestyle.BeginScope(Startup._container))
+                    await _commandBus.DispatchAsync(command);
+                if (command.HaveResult())
+                {
+                    var commandResult = command.GetResult();
+                    result = Ok(commandResult);
+                }
                 else
                     result = Ok();
             }
@@ -55,7 +62,7 @@ namespace DynamicAndGenericControllersSample.Controllers
                 result = BadRequest(e.Message);
             }
             return result;
-           
+
         }
     }
 }

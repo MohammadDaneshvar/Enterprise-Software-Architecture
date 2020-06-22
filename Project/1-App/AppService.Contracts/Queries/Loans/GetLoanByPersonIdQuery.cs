@@ -5,9 +5,9 @@ using System.Text;
 
 namespace AppService.Contracts.Queries.Loans
 {
-    public class GetLoanByPersonIdQuery : IHaveResult
+    public class GetLoanByPersonIdQuery<TResult> : IHaveResult<TResult>
     {
         public long Id { get; set; }
-        public object Result { get; set; }
+        public TResult Result { get; set; }
     }
 }

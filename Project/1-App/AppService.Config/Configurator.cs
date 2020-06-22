@@ -34,7 +34,7 @@ namespace AppService.Config
         public static void WireUp(Container container)
         {
             container.Register<IUnitOfWork, EFUnitOfWork>();
-            container.Register<IDbContext>(()=> new FRIDbContext());
+            //container.Register<IDbContext>(()=> new FRIDbContext());
             //container.Register<IDbContext,FRIDbContext>();
 
 

@@ -15,18 +15,19 @@ namespace Infra.Persistance.EF
     public class FRIDbContext : DbContext, IDbContext
     {
         public DbSet<Log> Logs { get; set; }
-        //public FRIDbContext():base(GetOptions("Data Source=.;Initial Catalog=FRI;User ID=sa;Password=123456"))
+        //public FRIDbContext()
         //{
 
         //}
+        public FRIDbContext(string connectionString ) : base(GetOptions(connectionString))
+        {
+
+        }
         public FRIDbContext(DbContextOptions options) : base(options)
         {
 
         }
-        public FRIDbContext()
-        {
-
-        }
+        
         //protected internal virtual void OnModelCreating(ModelBuilder modelBuilder)
         //{
         //    base.OnModelCreating(modelBuilder);

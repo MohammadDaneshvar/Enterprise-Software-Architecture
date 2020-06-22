@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SimpleInjector;
+using SimpleInjector.Lifestyles;
+
 namespace DynamicAndGenericControllersSample
 {
     public class RemoteControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
@@ -58,7 +60,8 @@ namespace DynamicAndGenericControllersSample
 
             foreach (var command in commands)
             {
-                feature.Controllers.Add(typeof(BaseController<>).MakeGenericType(command).GetTypeInfo());
+                using (AsyncScopedLifestyle.BeginScope(Startup._container))
+                    feature.Controllers.Add(typeof(BaseController<>).MakeGenericType(command).GetTypeInfo());
             }
             //  }
             //   }
