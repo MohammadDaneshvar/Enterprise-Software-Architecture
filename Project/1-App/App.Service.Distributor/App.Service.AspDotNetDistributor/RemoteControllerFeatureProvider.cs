@@ -61,7 +61,10 @@ namespace DynamicAndGenericControllersSample
             foreach (var command in commands)
             {
                 using (AsyncScopedLifestyle.BeginScope(Startup._container))
-                    feature.Controllers.Add(typeof(BaseController<>).MakeGenericType(command).GetTypeInfo());
+                {
+                    var controller = typeof(BaseController<>).MakeGenericType(command).GetTypeInfo();
+                    feature.Controllers.Add(controller);
+                }
             }
             //  }
             //   }

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace AppService.Contracts
 {
+    [CommandRoute("CreateLoanCommand")]
     public class CreateLoanCommand : IRestrictedCommand,IHaveResult<int>
     {
         public long PersonId { get; set; }

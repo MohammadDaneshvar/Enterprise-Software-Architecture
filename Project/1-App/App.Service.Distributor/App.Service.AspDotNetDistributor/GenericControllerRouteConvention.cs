@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AppService.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Routing;
 using System.Reflection;
 
 namespace DynamicAndGenericControllersSample
@@ -11,13 +13,15 @@ namespace DynamicAndGenericControllersSample
             if (controller.ControllerType.IsGenericType)
             {
                 var genericType = controller.ControllerType.GenericTypeArguments[0];
-                var customNameAttribute = genericType.GetCustomAttribute<GeneratedControllerAttribute>();
+                var generatedControllerAttribute = genericType.GetCustomAttribute<GeneratedControllerAttribute>();
+                var commandCustomNameAttribute = genericType.GetCustomAttribute<CommandRouteAttribute>();
 
-                if (customNameAttribute?.Route != null)
+                var route = generatedControllerAttribute?.Route + '/' + commandCustomNameAttribute.Route;
+                if (string.IsNullOrEmpty(route))
                 {
                     controller.Selectors.Add(new SelectorModel
                     {
-                        AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(customNameAttribute.Route)),
+                        AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(route)),
                     });
                 }
                 else

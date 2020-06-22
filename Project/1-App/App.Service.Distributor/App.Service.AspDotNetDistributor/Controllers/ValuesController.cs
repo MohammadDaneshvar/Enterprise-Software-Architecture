@@ -17,7 +17,7 @@ using System.Reflection;
 
 namespace DynamicAndGenericControllersSample.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api2/[controller]")]
     public class BaseController<T> : Controller where T : IRestrictedCommand
     {
         private readonly IServiceProvider _serviceProvider;
