@@ -17,4 +17,5 @@ namespace AppService.Common
             return CastToInfo.MakeGenericMethod(new[] { targetType }).Invoke(null, new[] { source });
         }
     }
+
 }

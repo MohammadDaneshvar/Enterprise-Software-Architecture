@@ -10,16 +10,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
-using AppService.Common;
 using Framework.Application.Common.Extentions;
 using Framework.Data.EF;
 using System.Reflection;
+using AppService.Contracts;
 
 namespace DynamicAndGenericControllersSample.Controllers
 {
     [Route("api2/[controller]")]
     public class BaseController<T> : Controller where T : IRestrictedCommand
     {
+        
         private readonly IServiceProvider _serviceProvider;
         private readonly ICommandBus _commandBus;
 
@@ -42,7 +43,7 @@ namespace DynamicAndGenericControllersSample.Controllers
             return result;
         }
 
-        public async Task<IActionResult> MakeHandlerAsync(T command)
+        private async Task<IActionResult> MakeHandlerAsync(T command)
         {
             IActionResult result = null;
             try

@@ -21,6 +21,9 @@ using Framework.Application;
 using Framework.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Framework.Application.Common.Attributes;
+using Nancy.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace DynamicAndGenericControllersSample
 {
@@ -40,11 +43,7 @@ namespace DynamicAndGenericControllersSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
+            
             services.AddControllersWithViews();
             services.AddInfrastructure(_configuration, true);
             services.AddServiceQuery(_configuration, true);
@@ -86,6 +85,35 @@ namespace DynamicAndGenericControllersSample
             services.AddInfrastructure(_configuration, true);
             services.AddServiceQuery(_configuration, true);
 
+
+            services.AddSwaggerGen(setupAction =>
+            {
+                setupAction.SwaggerDoc(
+                   name: "LibraryOpenAPISpecification",
+                   info: new Microsoft.OpenApi.Models.OpenApiInfo()
+                   {
+                       Title = "Library API",
+                       Version = "1",
+                       Description = "Through this API you can access authors and their books.",
+                       Contact = new Microsoft.OpenApi.Models.OpenApiContact()
+                       {
+                           Email = "name@site.com",
+                           Name = "DNT",
+                           Url = new Uri("http://www.dotnettips.info")
+                       },
+                       License = new Microsoft.OpenApi.Models.OpenApiLicense()
+                       {
+                           Name = "MIT License",
+                           Url = new Uri("https://opensource.org/licenses/MIT")
+                       }
+                   });
+                setupAction.SchemaFilter<SwaggerIgnoreFilter>();
+            });
+            services.AddSwaggerGenNewtonsoftSupport();
+
+
+
+
         }
 
         private void InitializeContainer()
@@ -116,15 +144,7 @@ namespace DynamicAndGenericControllersSample
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
@@ -162,6 +182,16 @@ namespace DynamicAndGenericControllersSample
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/LibraryOpenAPISpecification/swagger.json", "My API V1");
             });
 
         }
